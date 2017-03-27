@@ -1,0 +1,28 @@
+{
+  "name": "alexa_flash_cards",
+  "version": "1.0.0",
+  "description": "Flash Card application for amazon echo",
+  "main": "index.js",
+  "dependencies": {
+    "alexa-app": "^4.0.0",
+    "bluebird": "^3.5.0",
+    "request": "^2.81.0",
+    "request-promise": "^4.2.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "github.com/joecodecreations/flash_cards_alexa"
+  },
+  "keywords": [
+    "alexa",
+    "amazon",
+    "flash",
+    "cards"
+  ],
+  "author": "Joseph Sanchez",
+  "license": "ISC"
+}
