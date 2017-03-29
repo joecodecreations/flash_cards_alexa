@@ -9,7 +9,7 @@ class Flashcard {
         return new Promise((resolve, reject) => {
             requestURL('http://flashcardquiz.com/api/alexa/' + phrase, (err, response, body) => {
                 body = JSON.parse(response.body);
-                var response = body['title'];
+                //  var response = body['title'];
                 resolve(body);
             });
         });

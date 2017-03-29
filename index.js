@@ -5,17 +5,29 @@ var Promise = require('bluebird');
 
 var Flashcard = require("./flashcard");
 var newFlashcard = new Flashcard;
-
-
+var instructions = '';
 var readyForPhrase = false;
+var sessionable = false;
+var globalData;
 
 app.launch((request, response) => {
-    var intro = 'Welcome to Flash Card Quiz. This skill allows you to test your knowledge with flash cards. You can build your own set of cards at flash card quiz dot com.';
-    var message = 'Simply state the phrase that is associated with your deck to start your quiz. <break time="500ms"/> Always start your phrase with <break time="200ms"/> My alexa phrase is. For instance if your phrase is <break time="200ms"/> my fun dog likes to play <break time="400ms"/> simply say.';
-    var instructions = '<break time="400ms"/> My alexa phrase is my fun dog likes to play. Now, what is your phrase?';
+    var intro = 'Welcome to the Flash Card Quiz skill. This skill allows you to test your knowledge with flash cards. You can build your own set of cards at flash card quiz dot com.';
+    var message = 'Each flash card deck can be accessed through Alexa through a custom phrase. <break time="500ms"/>';
+    // if (request.hasSession()) {
+    //     sessionable = true;
+    //     // instructions = "it appears your last phrase used was " + session.get(lastusedphrase) + " , is this correct?";
+    // }
+    // var session = request.getSession();
+    // if (session.get(lastusedphrase) != null || session.get(lastusedphrase) != undefined) {
+    //     instructions = "it appears your last phrase used was " + session.get(lastusedphrase) + " , is this correct?";
+    // } else {
+    instructions = '<break time="400ms"/> What is your custom phrase?';
+    // }
     //response.say(intro);
     //response.say(message);
+
     response.say(instructions).reprompt(instructions).shouldEndSession(false);
+    response.card("Welcome to Flash Card Quiz", "test here");
     readyForPhrase = true;
 });
 
@@ -27,7 +39,7 @@ app.intent("PhraseIntent", {
     },
     function (request, response) {
         var userinput = request.slot("USERINPUT");
-        var verify = 'You has selected the following phrase, ' + userinput + '<break time="300ms"/> Is this correct?';
+        var verify = 'I heard, ' + userinput + '<break time="300ms"/> Is this correct?';
         response.say(verify).reprompt(verify).shouldEndSession(false);
         confirmationIntent(userinput);
 
@@ -47,24 +59,25 @@ function confirmationIntent(userinput) {
 
             if (confirmation.includes("yes") || confirmation.includes("yeah") || confirmation.includes("yup")) {
 
-                //  response.say("confirmed, going to process " + userinput).shouldEndSession(false);;
 
+                // if (sessionable) {
+                //     session.set(lastusedphrase, userinput);
+                // }
                 return newFlashcard.getCards(userinput).then((data) => {
+
                     deckTitle = data.title;
                     response.say("Starting Flash Cards For " + deckTitle);
-                    // response.say("Starting Flash Cards For " + deckTitle);
-
-                    // var i = 0;
-                    //
-                    // while (i < (data.cards.length - 1)) {
-                    //
-                    //     //  console.log(response.cards[i]);
-                    //     response.say('Question ' + (i + 1) + ', ' + data.cards[i].question + '<break time="800ms"/>');
-                    //     response.say("" + data.cards[i].answer + '<break time="300ms"/>');
-                    //     i++;
-                    // }
-
-
+                    //  var response = "Starting Flash Cards for " + data.title;
+                    var i = 0;
+                    var dataSize = data.cards.length;
+                    while (i < dataSize) {
+                        var question = data.cards[i].question;
+                        var answer = data.cards[i].answer;
+                        response.say("Question, " + question + "<break time='3000ms'/> ");
+                        response.say("answer, " + answer + "<break time='2000ms'/> ");
+                        i++;
+                    }
+                    //  response.say('Answer, ' + data.cards[i].answer + ' <break time="300ms"/>');
                 });
 
 
@@ -75,6 +88,11 @@ function confirmationIntent(userinput) {
         });
     }
 }
+
+app.sessionEnded(function (request, response) {
+    logout(request.userId);
+});
+
 
 // connect the alexa-app to AWS Lambda
 exports.handler = app.lambda();
