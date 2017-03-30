@@ -8,6 +8,9 @@ class Flashcard {
     getCards(phrase) {
         return new Promise((resolve, reject) => {
             requestURL('http://flashcardquiz.com/api/alexa/' + phrase, (err, response, body) => {
+                if (err) {
+                    reject(err);
+                }
                 body = JSON.parse(response.body);
                 //  var response = body['title'];
                 resolve(body);
